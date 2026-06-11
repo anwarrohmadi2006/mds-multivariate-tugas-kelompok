@@ -75,9 +75,9 @@ df['MDS_X'], df['MDS_Y'], df['Sil'] = mds[:,0], mds[:,1], silhouette_samples(X, 
 df.to_csv('output/hasil_clustering.csv')
 
 # 5. CETAK HASIL (Singkat)
-print(f"✅ Data siap: {len(df)} Provinsi")
-print(f"✅ MDS -> Stress: {stress:.2f}% (<10% Baik), RSQ: {rsq:.4f} (>0.6 Baik)")
-print(f"✅ Ward K=3 -> Silhouette: {silhouette_score(X, df['Cluster']):.4f}, DB: {davies_bouldin_score(X, df['Cluster']):.4f}\n")
+print(f"Data siap: {len(df)} Provinsi")
+print(f"MDS -> Stress: {stress:.2f}% (<10% Baik), RSQ: {rsq:.4f} (>0.6 Baik)")
+print(f"Ward K=3 -> Silhouette: {silhouette_score(X, df['Cluster']):.4f}, DB: {davies_bouldin_score(X, df['Cluster']):.4f}\n")
 for l in sorted(df.Label.unique()):
     sub = df[df.Label == l]
     print(f" [{l}] {len(sub):2d} prov | Vol: {sub.Vol_2023.mean():>9,.0f} ton | Rp/kg: Rp {sub.Harga_2023.mean():>6,.0f} | Share: {sub.Share_2023.mean():>4.1f}%")
@@ -118,4 +118,4 @@ ax.axvline(df_sil.Sil.mean(), color='w', ls='--')
 ax.set_title(f"Silhouette Plot (Mean: {df_sil.Sil.mean():.4f})")
 plt.savefig('output/04_silhouette_per_provinsi.png', facecolor=bg); plt.close()
 
-print("\n✅ Chart 1-4 tersimpan di folder output/")
+print("\nChart 1-4 tersimpan di folder output/")
