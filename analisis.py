@@ -36,24 +36,111 @@ from scipy.stats import pearsonr
 os.makedirs('output', exist_ok=True)
 
 # ============================================================
-# 1-6. LOAD DATA DARI CSV YANG SUDAH DIPARSING
+# 1. EXTRACT DATA DARI XLSX
 # ============================================================
-CSV_FILE = "data_mds_udang_32provinsi.csv"
-df_panel = pd.read_csv(CSV_FILE).set_index("Provinsi")
+XLSX_FILE = "Query Builder Result - Selasa, 09 Juni 2026 pukul 06.10.20 WIB.xlsx"
 
-# Map column names to match the variables expected by the rest of the script
-df_panel.rename(columns={
-    "Volume_2023_ton": "Vol_2023",
-    "Nilai_2023_JutaRp": "Nilai_2023",
-    "Harga_2023_RpPerKg": "Harga_2023",
-    "Share_2023_Persen": "Share_2023",
-    "HargaShare_2023": "HargaShare_2023",
-    "Volume_2024_ton": "Vol_2024",
-    "Nilai_2024_JutaRp": "Nilai_2024",
-    "Harga_2024_RpPerKg": "Harga_2024",
-    "Share_2024_Persen": "Share_2024",
-    "HargaShare_2024": "HargaShare_2024"
-}, inplace=True)
+xl = pd.ExcelFile(XLSX_FILE)
+print(f"Sheet tersedia: {xl.sheet_names}")
+
+# --- Sheet 1: Volume (Ton) ---
+df_vol_raw = pd.read_excel(XLSX_FILE, sheet_name=xl.sheet_names[0], header=0)
+print(f"\nShape sheet Volume: {df_vol_raw.shape}")
+
+# --- Sheet 2: Nilai (Ribu Rupiah) ---
+df_val_raw = pd.read_excel(XLSX_FILE, sheet_name=xl.sheet_names[1], header=0)
+print(f"\nShape sheet Nilai: {df_val_raw.shape}")
+
+# ============================================================
+# 2. PREPROCESSING — IDENTIFIKASI STRUKTUR KOLOM
+# ============================================================
+def parse_sheet(df_raw, value_label='Vol'):
+    df = df_raw.copy()
+    prov_col = df.columns[0]
+    df[prov_col] = df[prov_col].astype(str).str.strip()
+    df = df[~df[prov_col].str.lower().isin(['nan', 'total', 'indonesia', 'jumlah'])]
+    df = df.set_index(prov_col)
+    df = df.replace('-', 0).replace('', 0)
+    df = df.apply(pd.to_numeric, errors='coerce').fillna(0)
+    return df
+
+df_vol = parse_sheet(df_vol_raw, 'Vol')
+df_val = parse_sheet(df_val_raw, 'Nilai')
+
+# ============================================================
+# 3. IDENTIFIKASI KOMODITAS DAN TAHUN
+# ============================================================
+import re
+def detect_year_commodity(columns):
+    results = []
+    for col in columns:
+        col_str = str(col)
+        years_found = re.findall(r'20\d{2}', col_str)
+        if years_found:
+            year = int(years_found[-1])
+            commodity = re.sub(r'20\d{2}', '', col_str).strip(' _.-')
+            results.append((col, commodity, year))
+        else:
+            results.append((col, col_str, None))
+    return results
+
+col_info_vol = detect_year_commodity(df_vol.columns)
+col_info_val = detect_year_commodity(df_val.columns)
+
+# ============================================================
+# 4. EXTRACT UDANG — VOLUME & NILAI PER TAHUN
+# ============================================================
+def get_udang_cols(df, col_info, target_years):
+    result = {}
+    for col, comm, year in col_info:
+        if year in target_years and 'udang' in comm.lower():
+            result[year] = col
+    return result
+
+udang_vol_cols = get_udang_cols(df_vol, col_info_vol, [2023, 2024])
+udang_val_cols = get_udang_cols(df_val, col_info_val, [2023, 2024])
+
+# ============================================================
+# 5. HITUNG TOTAL PRODUKSI PER PROVINSI (untuk Share)
+# ============================================================
+def get_total_cols(df, col_info, year):
+    return [col for col, comm, y in col_info if y == year]
+
+total_vol_2023_cols = get_total_cols(df_vol, col_info_vol, 2023)
+total_vol_2024_cols = get_total_cols(df_vol, col_info_vol, 2024)
+total_val_2023_cols = get_total_cols(df_val, col_info_val, 2023)
+total_val_2024_cols = get_total_cols(df_val, col_info_val, 2024)
+
+# ============================================================
+# 6. BANGUN DATAFRAME PANEL (5 VARIABEL × 2 TAHUN = 10 DIM)
+# ============================================================
+common_prov = df_vol.index.intersection(df_val.index)
+
+records = []
+for prov in common_prov:
+    vol_23 = float(df_vol.loc[prov, udang_vol_cols.get(2023, df_vol.columns[0])])
+    vol_24 = float(df_vol.loc[prov, udang_vol_cols.get(2024, df_vol.columns[0])])
+    val_23 = float(df_val.loc[prov, udang_val_cols.get(2023, df_val.columns[0])]) / 1000
+    val_24 = float(df_val.loc[prov, udang_val_cols.get(2024, df_val.columns[0])]) / 1000
+    tot_vol_23 = float(df_vol.loc[prov, total_vol_2023_cols].sum())
+    tot_vol_24 = float(df_vol.loc[prov, total_vol_2024_cols].sum())
+
+    harga_23 = (val_23 * 1_000_000) / vol_23 if vol_23 > 0 else 0
+    harga_24 = (val_24 * 1_000_000) / vol_24 if vol_24 > 0 else 0
+    share_23 = (vol_23 / tot_vol_23 * 100) if tot_vol_23 > 0 else 0
+    share_24 = (vol_24 / tot_vol_24 * 100) if tot_vol_24 > 0 else 0
+    hs_23 = harga_23 * share_23 / 1000
+    hs_24 = harga_24 * share_24 / 1000
+
+    records.append({
+        'Provinsi': prov,
+        'Vol_2023': vol_23, 'Nilai_2023': val_23,
+        'Harga_2023': harga_23, 'Share_2023': share_23, 'HargaShare_2023': hs_23,
+        'Vol_2024': vol_24, 'Nilai_2024': val_24,
+        'Harga_2024': harga_24, 'Share_2024': share_24, 'HargaShare_2024': hs_24,
+    })
+
+df_panel = pd.DataFrame(records).set_index('Provinsi')
 
 # Filter: hanya provinsi yang punya data udang di KEDUA tahun
 df_panel = df_panel[(df_panel['Vol_2023'] > 0) & (df_panel['Vol_2024'] > 0)]
@@ -397,7 +484,7 @@ print("✅ Chart 4: Silhouette per Provinsi (Tersimpan sebagai PNG)")
 print("\n" + "="*65)
 print("RINGKASAN ANALISIS SELESAI")
 print("="*65)
-print(f"  File input    : {CSV_FILE}")
+print(f"  File input    : {XLSX_FILE}")
 print(f"  Provinsi valid: {len(df_panel)}")
 print(f"  Variabel      : 10 (5 var × 2 tahun)")
 print(f"  K optimal     : {K_OPTIMAL}")
