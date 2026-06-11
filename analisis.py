@@ -36,7 +36,7 @@ for p in df_vol.index.intersection(df_val.index):
     n23, n24 = float(df_val.loc[p, 39])/1000, float(df_val.loc[p, 40])/1000
     t23, t24 = float(df_vol.loc[p, [5,11,17,23,29,35,41,47,53,59,65]].sum()), float(df_vol.loc[p, [6,12,18,24,30,36,42,48,54,60,66]].sum())
     
-    h23, h24 = (n23*1e6)/v23 if v23>0 else 0, (n24*1e6)/v24 if v24>0 else 0
+    h23, h24 = (n23*1e3)/v23 if v23>0 else 0, (n24*1e3)/v24 if v24>0 else 0
     s23, s24 = (v23/t23)*100 if t23>0 else 0, (v24/t24)*100 if t24>0 else 0
     
     records.append({'Provinsi': p, 
