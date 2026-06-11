@@ -278,10 +278,8 @@ fig_es.update_xaxes(title_text='K', row=1, col=2)
 fig_es.update_yaxes(title_text='Inertia (WCSS)', row=1, col=1)
 fig_es.update_yaxes(title_text='Silhouette Score', row=1, col=2)
 
-fig_es.write_image('output/01_elbow_silhouette.png', scale=2)
-with open('output/01_elbow_silhouette.png.meta.json', 'w') as f:
-    json.dump({"caption": f"Elbow & Silhouette — K=3 Optimal (10 Var, {len(df_panel)} Provinsi)"}, f)
-print("✅ Chart 1: Elbow + Silhouette")
+fig_es.write_html('output/01_elbow_silhouette.html')
+print("✅ Chart 1: Elbow + Silhouette (Tersimpan sebagai HTML)")
 
 # ============================================================
 # 15. VISUALISASI 2 — PETA MDS FINAL
@@ -353,10 +351,8 @@ fig_mds.update_layout(
     margin=dict(l=60, r=60, t=150, b=60)
 )
 
-fig_mds.write_image('output/02_peta_mds_final.png', scale=2)
-with open('output/02_peta_mds_final.png.meta.json', 'w') as f:
-    json.dump({"caption": f"Peta MDS Final — HC Ward K=3, {len(df_panel)} Provinsi (2023–2024)"}, f)
-print("✅ Chart 2: Peta MDS")
+fig_mds.write_html('output/02_peta_mds_final.html')
+print("✅ Chart 2: Peta MDS (Tersimpan sebagai HTML)")
 
 # ============================================================
 # 16. VISUALISASI 3 — DENDROGRAM HIERARCHICAL WARD
@@ -456,10 +452,8 @@ fig_sil.update_layout(
     font=dict(color='white', size=11), width=900, height=860,
     margin=dict(l=130, r=60, t=150, b=60)
 )
-fig_sil.write_image('output/04_silhouette_per_provinsi.png', scale=2)
-with open('output/04_silhouette_per_provinsi.png.meta.json', 'w') as f:
-    json.dump({"caption": f"Silhouette per Provinsi — HC Ward K=3 (rata²={sil_hc3:.4f})"}, f)
-print("✅ Chart 4: Silhouette per Provinsi")
+fig_sil.write_html('output/04_silhouette_per_provinsi.html')
+print("✅ Chart 4: Silhouette per Provinsi (Tersimpan sebagai HTML)")
 
 # ============================================================
 # 18. CETAK RINGKASAN AKHIR
@@ -485,8 +479,8 @@ print(f"    ARI vs KM   : {ari:.4f}  (→ 1.00 ✅)")
 print()
 print(f"  OUTPUT:")
 print(f"    output/hasil_clustering.csv")
-print(f"    output/01_elbow_silhouette.png")
-print(f"    output/02_peta_mds_final.png")
+print(f"    output/01_elbow_silhouette.html")
+print(f"    output/02_peta_mds_final.html")
 print(f"    output/03_dendrogram_hc_ward.png")
-print(f"    output/04_silhouette_per_provinsi.png")
+print(f"    output/04_silhouette_per_provinsi.html")
 print("="*65)
