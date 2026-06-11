@@ -239,47 +239,34 @@ SYM = {
 # ============================================================
 # 14. VISUALISASI 1 — ELBOW + SILHOUETTE
 # ============================================================
-fig_es = make_subplots(rows=1, cols=2,
-    subplot_titles=('Elbow Method (Inertia/WCSS)', 'Silhouette Score per K'))
+fig, ax = plt.subplots(1, 2, figsize=(14, 5))
+fig.patch.set_facecolor('#0a1223')
+for a in ax:
+    a.set_facecolor('#0a1223')
+    a.tick_params(colors='white')
+    for sp in ['top', 'right']: a.spines[sp].set_visible(False)
+    for sp in ['bottom', 'left']: a.spines[sp].set_color('#444')
 
-fig_es.add_trace(go.Scatter(
-    x=df_k['k'], y=df_k['inertia'], mode='lines+markers',
-    name='Inertia', line=dict(color='#1DB954', width=2.5),
-    marker=dict(size=9), fill='tozeroy', fillcolor='rgba(29,185,84,0.10)'
-), row=1, col=1)
+ax[0].plot(df_k['k'], df_k['inertia'], marker='o', color='#1DB954', linewidth=2.5)
+ax[0].fill_between(df_k['k'], df_k['inertia'], color='#1DB954', alpha=0.1)
+ax[0].axvline(3, color='#F5A623', linestyle='--')
+ax[0].set_title('Elbow Method (Inertia)', color='white')
+ax[0].set_xlabel('K', color='white')
+ax[0].set_ylabel('Inertia (WCSS)', color='white')
 
-for col_name, color, name in [
-    ('sil_km', '#4A90E2', 'K-Means'),
-    ('sil_hc', '#E74C3C', 'HC-Ward')
-]:
-    fig_es.add_trace(go.Scatter(
-        x=df_k['k'], y=df_k[col_name], mode='lines+markers',
-        name=name, line=dict(color=color, width=2.5),
-        marker=dict(size=9)
-    ), row=1, col=2)
+ax[1].plot(df_k['k'], df_k['sil_km'], marker='o', color='#4A90E2', label='K-Means', linewidth=2.5)
+ax[1].plot(df_k['k'], df_k['sil_hc'], marker='o', color='#E74C3C', label='HC-Ward', linewidth=2.5)
+ax[1].axvline(3, color='#F5A623', linestyle='--')
+ax[1].set_title('Silhouette Score per K', color='white')
+ax[1].set_xlabel('K', color='white')
+ax[1].set_ylabel('Silhouette Score', color='white')
+ax[1].legend(facecolor='#0a1223', labelcolor='white')
 
-for col_idx in [1, 2]:
-    fig_es.add_vline(x=3, line_dash='dash', line_color='#F5A623',
-                     line_width=2, row=1, col=col_idx)
-
-fig_es.update_layout(
-    title=dict(text=(
-        "Penentuan K Optimal — Elbow & Silhouette<br>"
-        "<span style='font-size:13px;font-weight:normal;'>"
-        f"Data Panel 2023+2024, 10 Variabel, {len(df_panel)} Provinsi | K=3 optimal</span>"
-    )),
-    legend=dict(orientation='h', yanchor='bottom', y=1.07, xanchor='center', x=0.5),
-    plot_bgcolor='rgba(10,18,35,1)', paper_bgcolor='rgba(10,18,35,1)',
-    font=dict(color='white', size=11), width=1100, height=520,
-    margin=dict(l=60, r=60, t=150, b=60)
-)
-fig_es.update_xaxes(title_text='K', row=1, col=1)
-fig_es.update_xaxes(title_text='K', row=1, col=2)
-fig_es.update_yaxes(title_text='Inertia (WCSS)', row=1, col=1)
-fig_es.update_yaxes(title_text='Silhouette Score', row=1, col=2)
-
-fig_es.write_html('output/01_elbow_silhouette.html')
-print("✅ Chart 1: Elbow + Silhouette (Tersimpan sebagai HTML)")
+plt.suptitle(f"Penentuan K Optimal — Panel 2023+2024 ({len(df_panel)} Prov)", color='white')
+plt.tight_layout()
+plt.savefig('output/01_elbow_silhouette.png', dpi=150, facecolor='#0a1223')
+plt.close()
+print("✅ Chart 1: Elbow + Silhouette (Tersimpan sebagai PNG)")
 
 # ============================================================
 # 15. VISUALISASI 2 — PETA MDS FINAL
@@ -289,70 +276,32 @@ vol_max = df_panel['Vol_2023'].max()
 def vol2size(v, base=11, rng=24):
     return base + (v - vol_min) / (vol_max - vol_min) * rng
 
-fig_mds = go.Figure()
+fig, ax = plt.subplots(figsize=(12, 8))
+fig.patch.set_facecolor('#0a1223')
+ax.set_facecolor('#0a1223')
+ax.tick_params(colors='white')
+for sp in ['top', 'right']: ax.spines[sp].set_visible(False)
+for sp in ['bottom', 'left']: ax.spines[sp].set_color('#444')
+
 for lbl in ['C1: Volume Besar', 'C2: Share Tinggi', 'C3: Produser Umum']:
     sub = df_panel[df_panel['Label'] == lbl]
     if len(sub) == 0: continue
-    sizes = [32 if lbl == 'C1: Volume Besar' else
-             22 if lbl == 'C2: Share Tinggi' else
-             vol2size(v) for v in sub['Vol_2023']]
+    sizes = [400 if lbl == 'C1: Volume Besar' else 250 if lbl == 'C2: Share Tinggi' else vol2size(v)*8 for v in sub['Vol_2023']]
+    
+    ax.scatter(sub['MDS_X'], sub['MDS_Y'], s=sizes, c=CLR[lbl], label=f"{lbl} (n={len(sub)})", alpha=0.9, edgecolors='white', linewidths=1)
+    
+    for _, row in sub.iterrows():
+        ax.text(row['MDS_X'], row['MDS_Y'] + 0.15, short(row.name), color='white', fontsize=8, ha='center', va='bottom')
 
-    fig_mds.add_trace(go.Scatter(
-        x=sub['MDS_X'], y=sub['MDS_Y'],
-        mode='markers+text',
-        name=f"{lbl} (n={len(sub)})",
-        text=[short(p) for p in sub.index],
-        textposition='top center',
-        textfont=dict(size=9, color='white'),
-        marker=dict(size=sizes, color=CLR[lbl], symbol=SYM[lbl],
-                    opacity=0.90, line=dict(width=1.5, color='rgba(255,255,255,0.4)')),
-        hovertemplate=(
-            '<b>%{text}</b><br>'
-            'Vol 2023: %{customdata[0]:,.0f} ton<br>'
-            'Harga: Rp%{customdata[1]:,.0f}/kg<br>'
-            'Share: %{customdata[2]:.2f}%<br>'
-            'Nilai: Rp%{customdata[3]:.1f}M<br>'
-            'Silhouette: %{customdata[4]:.3f}<extra></extra>'
-        ),
-        customdata=list(zip(
-            sub['Vol_2023'], sub['Harga_2023'],
-            sub['Share_2023'], sub['Nilai_2023'], sub['Sil_HC'].round(3)
-        ))
-    ))
+ax.set_title(f"Peta MDS — Hierarchical Ward K=3 (Stress: {stress:.2f}%, RSQ: {rsq:.4f})", color='white', pad=15)
+ax.set_xlabel('Dimensi 1 MDS', color='white')
+ax.set_ylabel('Dimensi 2 MDS', color='white')
+ax.legend(facecolor='#0a1223', labelcolor='white', loc='lower left')
 
-fig_mds.add_annotation(
-    x=0.99, y=0.02, xref='paper', yref='paper', xanchor='right',
-    text=(
-        f"<b>Metrik (K=3)</b><br>"
-        f"Stress MDS : {stress:.2f}%  ✅<br>"
-        f"RSQ        : {rsq:.4f}  ✅<br>"
-        f"Sil HC     : {sil_hc3:.4f}  ✅<br>"
-        f"Sil KMeans : {sil_km3:.4f}  ✅<br>"
-        f"DB HC      : {db_hc3:.4f}  ✅<br>"
-        f"ARI        : {ari:.4f}  ✅<br>"
-        f"Cophenetic : {coph_corr:.4f}  ✅"
-    ),
-    showarrow=False, font=dict(size=10.5, color='white'), align='left',
-    bgcolor='rgba(10,25,45,0.85)', bordercolor='rgba(74,144,226,0.5)',
-    borderwidth=1.5, borderpad=7
-)
-
-fig_mds.update_layout(
-    title=dict(text=(
-        f"Peta MDS — Hierarchical Ward K=3, Panel 2023+2024<br>"
-        f"<span style='font-size:13px;font-weight:normal;'>"
-        f"{len(df_panel)} Provinsi | 10 Variabel | RobustScaler | BPS 2023–2024</span>"
-    )),
-    legend=dict(orientation='h', yanchor='bottom', y=1.07, xanchor='center', x=0.5, font=dict(size=11)),
-    xaxis=dict(title='Dimensi 1 MDS', gridcolor='rgba(255,255,255,0.07)', zeroline=False),
-    yaxis=dict(title='Dimensi 2 MDS', gridcolor='rgba(255,255,255,0.07)', zeroline=False),
-    plot_bgcolor='rgba(10,18,35,1)', paper_bgcolor='rgba(10,18,35,1)',
-    font=dict(color='white', size=11), width=1200, height=860,
-    margin=dict(l=60, r=60, t=150, b=60)
-)
-
-fig_mds.write_html('output/02_peta_mds_final.html')
-print("✅ Chart 2: Peta MDS (Tersimpan sebagai HTML)")
+plt.tight_layout()
+plt.savefig('output/02_peta_mds_final.png', dpi=150, facecolor='#0a1223')
+plt.close()
+print("✅ Chart 2: Peta MDS (Tersimpan sebagai PNG)")
 
 # ============================================================
 # 16. VISUALISASI 3 — DENDROGRAM HIERARCHICAL WARD
@@ -418,42 +367,29 @@ df_sil = df_panel[['Label', 'Sil_HC']].copy()
 df_sil['prov'] = [short(p) for p in df_sil.index]
 df_sil['ord'] = df_sil['Label'].map({'C1: Volume Besar':0,'C2: Share Tinggi':1,'C3: Produser Umum':2})
 df_sil = df_sil.sort_values(['ord', 'Sil_HC'], ascending=[True, True])
+colors = [CLR[l] for l in df_sil['Label']]
 
-fig_sil = go.Figure()
-fig_sil.add_trace(go.Bar(
-    x=df_sil['Sil_HC'], y=df_sil['prov'],
-    orientation='h',
-    marker=dict(color=[CLR[l] for l in df_sil['Label']], line=dict(width=0)),
-    opacity=0.88, showlegend=False,
-    hovertemplate='<b>%{y}</b><br>Silhouette: %{x:.3f}<extra></extra>'
-))
-fig_sil.add_shape(type='line', x0=0.5, x1=0.5, y0=-0.5, y1=len(df_sil)-0.5,
-                  line=dict(color='#F5A623', width=2, dash='dash'))
-fig_sil.add_annotation(x=0.5, y=len(df_sil)-0.5,
-                        text='Threshold 0.50', showarrow=False,
-                        font=dict(color='#F5A623', size=10),
-                        xanchor='left', xshift=5)
+fig, ax = plt.subplots(figsize=(10, 8))
+fig.patch.set_facecolor('#0a1223')
+ax.set_facecolor('#0a1223')
+ax.tick_params(colors='white', labelsize=8)
+for sp in ['top', 'right']: ax.spines[sp].set_visible(False)
+for sp in ['bottom', 'left']: ax.spines[sp].set_color('#444')
 
-for lbl, col in CLR.items():
-    n = len(df_panel[df_panel['Label']==lbl])
-    fig_sil.add_trace(go.Scatter(x=[None], y=[None], mode='markers',
-        name=f"{lbl} (n={n})", marker=dict(size=10, color=col)))
+ax.barh(df_sil['prov'], df_sil['Sil_HC'], color=colors, alpha=0.9)
+ax.axvline(0.5, color='#F5A623', linestyle='--')
+ax.text(0.51, len(df_sil)-1, 'Threshold 0.50', color='#F5A623', va='bottom')
 
-fig_sil.update_layout(
-    title=dict(text=(
-        f"Silhouette Score per Provinsi — HC Ward K=3<br>"
-        f"<span style='font-size:13px;font-weight:normal;'>"
-        f"Sil rata² = {sil_hc3:.4f} | DB = {db_hc3:.4f} | Cophenetic = {coph_corr:.4f}</span>"
-    )),
-    legend=dict(orientation='h', yanchor='bottom', y=1.07, xanchor='center', x=0.5, font=dict(size=10)),
-    xaxis=dict(title='Silhouette Score', range=[-0.15, 1.05], gridcolor='rgba(255,255,255,0.07)'),
-    yaxis=dict(title='', tickfont=dict(size=9)),
-    plot_bgcolor='rgba(10,18,35,1)', paper_bgcolor='rgba(10,18,35,1)',
-    font=dict(color='white', size=11), width=900, height=860,
-    margin=dict(l=130, r=60, t=150, b=60)
-)
-fig_sil.write_html('output/04_silhouette_per_provinsi.html')
-print("✅ Chart 4: Silhouette per Provinsi (Tersimpan sebagai HTML)")
+ax.set_title(f"Silhouette Score per Provinsi (rata-rata: {sil_hc3:.4f})", color='white', pad=15)
+ax.set_xlabel('Silhouette Score', color='white')
+
+patches = [mpatches.Patch(color=CLR[lbl], label=f'{lbl}') for lbl in ['C1: Volume Besar', 'C2: Share Tinggi', 'C3: Produser Umum']]
+ax.legend(handles=patches, facecolor='#0a1223', labelcolor='white', loc='lower right')
+
+plt.tight_layout()
+plt.savefig('output/04_silhouette_per_provinsi.png', dpi=150, facecolor='#0a1223')
+plt.close()
+print("✅ Chart 4: Silhouette per Provinsi (Tersimpan sebagai PNG)")
 
 # ============================================================
 # 18. CETAK RINGKASAN AKHIR
@@ -461,7 +397,7 @@ print("✅ Chart 4: Silhouette per Provinsi (Tersimpan sebagai HTML)")
 print("\n" + "="*65)
 print("RINGKASAN ANALISIS SELESAI")
 print("="*65)
-print(f"  File input    : {XLSX_FILE}")
+print(f"  File input    : {CSV_FILE}")
 print(f"  Provinsi valid: {len(df_panel)}")
 print(f"  Variabel      : 10 (5 var × 2 tahun)")
 print(f"  K optimal     : {K_OPTIMAL}")
@@ -479,8 +415,8 @@ print(f"    ARI vs KM   : {ari:.4f}  (→ 1.00 ✅)")
 print()
 print(f"  OUTPUT:")
 print(f"    output/hasil_clustering.csv")
-print(f"    output/01_elbow_silhouette.html")
-print(f"    output/02_peta_mds_final.html")
+print(f"    output/01_elbow_silhouette.png")
+print(f"    output/02_peta_mds_final.png")
 print(f"    output/03_dendrogram_hc_ward.png")
-print(f"    output/04_silhouette_per_provinsi.html")
+print(f"    output/04_silhouette_per_provinsi.png")
 print("="*65)
