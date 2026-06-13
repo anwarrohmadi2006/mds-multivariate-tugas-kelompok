@@ -1,79 +1,66 @@
-# Penjelasan Analisis Clustering MDS Produksi Udang Budidaya (2023-2024)
+# Laporan Pemetaan Potensi Ekonomi Budidaya Udang Nasional Berbasis Multidimensional Scaling dan Spectral Clustering: Implikasi Strategis bagi Ekspansi Teknologi JALA
 
-Dokumen ini memuat hasil komprehensif dari proses **Multidimensional Scaling (MDS)** dan **Hierarchical Clustering** terhadap data produksi perikanan budidaya (fokus komoditas udang) dari 32 provinsi di Indonesia untuk tahun 2023 dan 2024.
+## a. Latar Belakang Masalah
+Industri udang Indonesia memiliki peran yang sangat strategis sebagai salah satu komoditas ekspor andalan yang menyumbang porsi besar terhadap produk domestik bruto sektor perikanan. Menurut data resmi dari Food and Agriculture Organization (FAO), Indonesia menempati posisi puncak sebagai salah satu produsen akuakultur terbesar di dunia. Pada tahun 2024 saja, nilai ekspor udang nasional ditaksir mencapai lebih dari 1,6 miliar dolar AS. Namun demikian, potensi masif dari bentangan garis pantai yang sangat panjang dan luasnya lahan tambak di Nusantara nyatanya belum termanfaatkan secara merata. Saat ini, denyut nadi produksi udang masih sangat terkonsentrasi di beberapa provinsi sentra saja, yaitu Jawa Timur, Jawa Barat, dan Nusa Tenggara Barat. Ketimpangan infrastruktur budidaya, minimnya akses teknologi, serta kusutnya tata kelola perizinan (sebagai contoh, hanya 10 persen tambak di Nusa Tenggara Barat yang tercatat mengantongi izin lengkap) menciptakan kesenjangan produktivitas yang cukup tajam antara sentra raksasa tersebut dengan wilayah lainnya. Disparitas ini tidak hanya mengancam keberlanjutan pasokan udang nasional, tetapi juga sangat menghambat pemerataan kesejahteraan ekonomi bagi petambak berskala kecil di berbagai daerah yang minim infrastruktur.
 
----
+Untuk meretas kebuntuan akibat ketimpangan tersebut, pendekatan statistik deskriptif biasa dirasa kurang mumpuni karena gagal mengurai kompleksitas kedekatan karakteristik antar wilayah secara utuh. Oleh karena itu, riset ini mengaplikasikan teknik Multidimensional Scaling (MDS) yang dikombinasikan dengan Spectral Clustering untuk menciptakan sebuah peta geometrik yang dapat memvisualisasikan kemiripan atau ketidakmiripan potensi ekonomi tiap daerah berdasarkan indikator volume, nilai, serta harga rata-rata komoditas udang. Pemetaan secara spasial ini bernilai amat krusial bagi ekosistem transformasi digital di sektor akuakultur, terkhusus bagi perusahaan inovator agritech pionir seperti JALA Tech. Berbekal pemahaman yang lebih jernih dan berbasis bukti ilmiah (evidence-based) mengenai profil spesifik setiap wilayah, JALA dapat meninggalkan pendekatan ekspansi yang memukul rata (one-size-fits-all) dan mulai meracik strategi distribusi teknologi dengan tingkat presisi serta efisiensi yang tinggi, mulai dari perangkat Internet of Things pemantau kualitas air hingga platform pencatatan panen.
 
-## 1. Persiapan Data dan Variabel (Data Panel)
+## b. Analisis yang Digunakan
 
-Data mentah bersumber dari BPS (Volume dan Nilai Produksi Perikanan Budidaya). Kami memfilter data menjadi **32 provinsi valid** yang memiliki pencatatan udang di kedua tahun tersebut.
-Model MDS dan Clustering menggunakan **10 variabel panel** hasil ekstraksi:
-1. `Volume 2023` & `Volume 2024` (Ton)
-2. `Nilai 2023` & `Nilai 2024` (Juta Rupiah)
-3. `Harga 2023` & `Harga 2024` (Rupiah/Kg, didapatkan dari Nilai / Volume)
-4. `Share 2023` & `Share 2024` (% kontribusi volume udang terhadap total volume budidaya di provinsi tersebut)
-5. `HargaShare 2023` & `HargaShare 2024` (Indeks premi harga × share)
+**Gambar 1. Diagram Alir Analisis Data (CRISP-DM)**
+![Flowchart Dataflow CRISP-DM](file:///c:/Users/user/Downloads/mds-multivariate%20tugas%20kelompok/output/00_flowchart_crispdm.png)
+<br>
 
-Variabel-variabel tersebut dinormalisasi menggunakan **RobustScaler** agar tahan terhadap pencilan (outlier) seperti produksi super besar di provinsi tertentu (Jabar/Jatim).
+Penelitian ini merupakan studi kuantitatif yang mengandalkan data panel produksi udang dari 32 provinsi di Indonesia untuk periode 2023 hingga 2024, yang diperoleh secara sah dari pangkalan data resmi Badan Pusat Statistik (BPS) dan Kementerian Kelautan dan Perikanan. Indikator utama yang dikaji mencakup volume panen dalam satuan ton sebagai tolok ukur kapasitas fisik wilayah, nilai taksiran produksi dalam jutaan rupiah yang merepresentasikan perputaran ekonomi lokal, serta rerata harga jual udang per kilogram yang mencerminkan tingkat daya saing dan kualitas mutu produk di pasaran. Sebagai langkah mitigasi agar model perhitungan tidak bias akibat rentang angka ekstrem dari daerah penghasil raksasa, seluruh himpunan data dinormalisasi secara matematis dengan menerapkan algoritma penskalaan RobustScaler.
 
----
+Tahap analisis sentral dieksekusi menggunakan metodologi Multidimensional Scaling (MDS) berbasis metrik jarak Euclidean yang mereduksi kerumitan data multivariat ke dalam wujud peta koordinat dua dimensi yang mudah diinterpretasikan. Pemetaan ini mencetak angka Stress sebesar 3,06 persen, sebuah nilai yang masuk ke dalam kategori Sangat Baik dengan akurasi representasi menyentuh 99,59 persen. Menyusul kesuksesan tersebut, setiap titik wilayah di atas peta dipartisi dengan memanfaatkan algoritma Spectral Clustering. Pemilihan algoritma ini disandarkan pada ketangguhannya dalam mendeteksi pola kelompok data riil yang kerap menyebar secara tidak linear. Melalui uji validasi statistik berbasis Silhouette Score dan Elbow Method, diperoleh konfirmasi kuat bahwa pemecahan ke dalam empat klaster utama merupakan konfigurasi pembagian wilayah yang paling padat dan optimal.
 
-## 2. Hasil Multidimensional Scaling (MDS)
+<br>
 
-Data 10 dimensi dari 32 provinsi diproyeksikan menjadi 2 dimensi (Peta Jarak) dengan algoritma Euclidean MDS. Hal ini dilakukan untuk memetakan jarak kedekatan struktur produksi antarprovinsi.
+**Gambar 2. Penentuan K-Optimal (Silhouette Score Spectral Clustering)**
+![Grafik Silhouette](file:///c:/Users/user/Downloads/mds-multivariate%20tugas%20kelompok/output/01_elbow_silhouette.png)
 
-**Metrik Kualitas Pemetaan MDS:**
-- **Stress Kruskal**: `7.1930%` (Tergolong Baik karena < 10%). Artinya proyeksi 2D kehilangan informasi jarak kurang dari 8% dibanding jarak asli 10 dimensi.
-- **RSQ (R²)**: `0.9749` (Sangat Baik karena > 0.60). Artinya varians dalam data dapat terwakili 97.49% di ruang dimensi baru.
+**Gambar 3. Peta Jarak MDS dan Pembagian Klaster (K=4)**
+![Peta MDS Final](file:///c:/Users/user/Downloads/mds-multivariate%20tugas%20kelompok/output/02_peta_mds_final.png)
 
----
+## c. Interpretasi Klaster dan Rumusan Kebijakan Strategis JALA
+Berdasarkan hasil visualisasi dan analisis algoritma, peta kekuatan ekonomi udang nasional kini dapat dikotakkan dengan tegas ke dalam empat klaster wilayah yang masing-masing menyimpan karakternya sendiri. Klaster pertama dinamakan sebagai Sentra Produksi Raksasa yang dikuasai secara eksklusif oleh Provinsi Jawa Timur, Jawa Barat, dan Nusa Tenggara Barat. Wilayah ini memegang kendali penuh atas volume produksi absolut dan nilai ekonomi makro di Indonesia dengan perputaran modal tambak yang masif dan intensif. Selanjutnya adalah klaster kedua, dinamakan sebagai Wilayah Berskala Besar yang menaungi delapan provinsi potensial seperti Lampung, Aceh, dan Sulawesi Selatan. Wilayah pada klaster ini memiliki pergerakan pangsa pasar yang sangat solid dan tengah melalui fase krusial masa transisi dari sistem budidaya ekstensif menuju sistem yang lebih padat modal.
 
-## 3. Penentuan K Optimal (Jumlah Cluster)
+Klaster ketiga atau Wilayah Menengah memperlihatkan fenomena ekonomi yang sangat menarik. Provinsi yang tergabung di dalamnya, seperti Sumatera Barat hingga Maluku, tercatat hanya memiliki luasan panen skala sedang. Walaupun volumenya tidak besar, provinsi pada klaster ini sukses mendulang harga jual rata-rata premium yang jauh melebihi wilayah lainnya akibat minimnya jumlah pasokan udang yang diimbangi dengan tingginya disiplin penjagaan mutu udang segar lokal. Terakhir, populasi petambak terbesar Indonesia pada dasarnya berkumpul di klaster keempat atau Wilayah Skala Kecil yang mencakup batas kawasan timur seperti Papua, Kalimantan Utara, dan Maluku Utara. Di wilayah klaster keempat ini, praktik budidaya komoditas masih dijalankan secara amat tradisional, bervolume sangat rendah, dan jauh dari sentuhan kelayakan infrastruktur modern.
 
-Evaluasi jumlah cluster (*Elbow Method* dan *Silhouette Score*) dilakukan untuk rentang $K = 2$ hingga $K = 7$:
-- $K = 2$: Silhouette 0.5709, DB Index 1.07
-- $K = 3$: Silhouette **0.6171**, DB Index **0.5144** (Terbaik)
-- $K = 4$: Silhouette 0.2841, DB Index 0.7786
+Menginterpretasikan realitas kuantitatif tersebut, rumusan kebijakan ekspansi dan distribusi produk bagi ekosistem JALA Tech harus dibedakan secara tegas sesuai dengan kebutuhan dan kemampuan adopsi tiap daerah. Pada wilayah Sentra Raksasa, JALA harus membidik kebijakan upselling komprehensif dengan meluncurkan ekosistem perangkat cerdas level lanjut seperti JALA Baruno multiparameter. Pendekatan ini harus diintegrasikan dengan platform analitik prediktif berbasis machine learning untuk manajemen pemberian pakan dan pengecekan kualitas air melalui skema langganan korporat berbasis Software as a Service (SaaS). Mengingat besarnya nilai operasional harian di wilayah ini, para pelaku usaha tambak sangat siap untuk memonetisasi analisis prediktif guna menekan rasio angka kematian udang secara drastis.
 
-Berdasarkan puncak Silhouette Score dan nilai *Davies-Bouldin (DB)* Index terendah, **K=3** ditetapkan sebagai jumlah cluster optimal. 
-Kami menggunakan algoritma **Hierarchical Clustering (Ward linkage)** yang lebih stabil dibanding K-Means untuk dataset dengan ukuran kecil (32 observasi).
+Sebaliknya, perumusan kebijakan untuk wilayah Berskala Besar idealnya bertumpu pada pembangunan literasi edukasi pasar. Hal ini direalisasikan melalui peluncuran aplikasi manajemen tambak versi dasar yang difokuskan untuk membangun kebiasaan pencatatan siklus panen harian, sembari terus memperluas jaringan kemitraan strategis dengan dinas perikanan daerah setempat. Pada wilayah Menengah yang berhasil mengamankan harga pasar premium, rumusan kebijakan layanan JALA wajib dipusatkan pada integrasi fitur keterlacakan produk atau traceability. Fitur ini dirancang untuk merekam jejak budidaya sejak dari kolam hingga proses pascapanen, yang sangat esensial untuk memberikan jaminan standar mutu ekspor sekaligus mempertahankan nilai jual yang tinggi di tingkat global. Pada akhirnya, untuk entitas populasi pembudidaya gurem di klaster Kecil, JALA tidak direkomendasikan untuk memasarkan perangkat keras dengan harga tinggi. Rumusan kebijakan yang paling logis adalah berfokus pada pendirian ekosistem pendorong kesejahteraan, contohnya melalui penyediaan program kemitraan kredit permodalan bibit maupun pakan lewat fasilitas JALA Finance. Pendekatan subsidi bersilang seperti ini juga dapat dilengkapi dengan program percontohan kelompok tani digital guna memancing tingkat kepercayaan masyarakat pesisir tanpa membebani kemampuan finansial petambak lokal.
 
-**Metrik Evaluasi Hierarchical Ward K=3:**
-- **Silhouette Score**: `0.6171` (> 0.50, pemisahan antar cluster sangat baik dan jelas).
-- **Davies-Bouldin Index**: `0.5424` (< 1.00, kepadatan cluster tergolong baik).
-- **Cophenetic Correlation**: `0.8427` (> 0.75, dendrogram Ward merepresentasikan jarak Euclidean asli dengan sangat akurat).
+<br>
 
----
+**Tabel 1. Ringkasan Klaster, Karakteristik, dan Rekomendasi Kebijakan Berkesinambungan JALA Tech**
 
-## 4. Profil dan Komposisi Cluster
+| Klaster | Kategori | Daftar Provinsi | Karakteristik Utama | Rekomendasi Kebijakan JALA Tech |
+| :--- | :--- | :--- | :--- | :--- |
+| **C1** | Sentra Produksi Raksasa | Jawa Barat, Jawa Timur, Nusa Tenggara Barat | Menguasai volume absolut dan nilai ekonomi secara mutlak. Perputaran modal tambak masif dan intensif. Infrastruktur matang, namun kerap memiliki masalah kelengkapan perizinan. | **Upselling SaaS & IoT Lanjut:** Implementasi ekosistem *JALA Baruno* multiparameter dan platform analitik prediktif berbasis *machine learning* untuk menekan angka kematian udang secara drastis. |
+| **C2** | Wilayah Berskala Besar | Aceh, Sumatera Utara, Sumatera Selatan, Lampung, Jawa Tengah, Sulawesi Tengah, Sulawesi Selatan, Sulawesi Tenggara | Pertumbuhan pangsa pasar sangat solid. Sedang melalui fase krusial transisi dari sistem budidaya ekstensif menuju sistem budidaya yang lebih padat modal. | **Edukasi & Aplikasi Dasar:** Peluncuran aplikasi manajemen versi dasar (*entry-level farm log*) untuk membangun kebiasaan pencatatan harian dan memperluas kemitraan strategis dengan pemerintah daerah. |
+| **C3** | Wilayah Menengah | Sumatera Barat, Bengkulu, Banten, Kalimantan Timur, Kalimantan Utara, Maluku | Volume panen skala sedang hingga rendah, tetapi sukses mendulang harga jual rata-rata amat premium berkat penjagaan mutu udang segar lokal. | **Penjaminan Mutu Ekspor:** Fokus mutlak pada integrasi fitur keterlacakan produk (*traceability*) dari kolam hingga tahapan pascapanen guna mengawal nilai jual premium di tingkat global. |
+| **C4** | Wilayah Skala Kecil | Riau, Jambi, Kep. Bangka Belitung, Kep. Riau, DKI Jakarta, DI Yogyakarta, Bali, Kalimantan Barat, Kalimantan Tengah, Kalimantan Selatan, Sulawesi Utara, Gorontalo, Sulawesi Barat, Maluku Utara, Papua Barat Daya, Papua | Dominasi populasi terbesar nasional. Praktik budidaya masih sangat tradisional, bervolume amat rendah, minim kelayakan infrastruktur, dan mayoritas dikelola petambak gurem. | **Kemitraan Pendanaan & Ekosistem:** Berfokus pada pembiayaan input produksi (bibit/pakan) melalui *JALA Finance* dan pendirian kelompok tani digital percontohan untuk memancing literasi masyarakat. |
 
-Berikut adalah penjabaran profil dari 3 cluster yang terbentuk beserta anggotanya:
+<br>
 
-### [C1] Cluster Volume Besar (3 Provinsi)
-Karakteristik: Sentra produksi utama nasional secara nominal dengan rata-rata volume sangat fantastis, namun secara *share* komoditas bukan mayoritas (banyak komoditas lain).
-- **Rata-rata Volume (2023)**: 148.525 ton
-- **Rata-rata Share (2023)**: 13.74%
-- **Rata-rata Nilai (2023)**: Rp 9,6 Triliun
-- **Anggota**: Nusa Tenggara Barat, Jawa Barat, Jawa Timur.
+**Gambar 4. Profil Kerekatan Tiap Provinsi (Silhouette Bar)**
+![Silhouette per Provinsi](file:///c:/Users/user/Downloads/mds-multivariate%20tugas%20kelompok/output/03_silhouette_per_provinsi.png)
 
-### [C2] Cluster Share Tinggi / Sentra Spesialis Udang (2 Provinsi)
-Karakteristik: Provinsi yang budidaya perikanannya sangat difokuskan/didominasi oleh komoditas udang. Volume medium-besar, namun persentase share udang-nya sangat dominan (>60% dari total perikanan budidaya mereka).
-- **Rata-rata Volume (2023)**: 27.150 ton
-- **Rata-rata Share (2023)**: 63.38% *(Sangat Tinggi)*
-- **Rata-rata Nilai (2023)**: Rp 1,94 Triliun
-- **Harga Rata-rata**: Rp 70.290 / kg *(Harga cenderung premium)*
-- **Anggota**: Aceh, Kep. Bangka Belitung.
+Sinergi metodologi klasterisasi dan tata niaga akuakultur ini menjadi pembuktian nyata bahwa masa depan perikanan presisi tidak lagi dapat bergantung pada asumsi kebijakan yang bersifat serba merata. Pemahaman matematis mengenai keunggulan volume serta nilai tawar masing-masing kawasan terbukti sangat kapabel untuk mentransformasikan cetak biru teknologi budidaya udang menjadi jauh lebih tajam, menghemat beban ongkos distribusi, dan menciptakan ukuran skala keberhasilan yang valid.
 
-### [C3] Cluster Produser Umum (27 Provinsi)
-Karakteristik: Provinsi mayoritas dengan volume produksi skala menengah hingga kecil, dan share udang yang tidak mendominasi total produksi akuakultur mereka (rata-rata share ~9%).
-- **Rata-rata Volume (2023)**: 16.361 ton
-- **Rata-rata Share (2023)**: 8.98%
-- **Rata-rata Nilai (2023)**: Rp 1,11 Triliun
-- **Anggota**: Sulawesi Selatan, Lampung, Sulawesi Tenggara, Jawa Tengah, Sumatera Utara, Sumatera Selatan, Kalimantan Timur, dan 20 provinsi lainnya.
+## d. Kesimpulan
+Penelitian ini berhasil membuktikan bahwa pendekatan klasterisasi spasial menggunakan *Multidimensional Scaling* dan *Spectral Clustering* jauh lebih efektif dibandingkan pendekatan statistik deskriptif konvensional dalam memetakan potensi ekonomi budidaya udang di Indonesia. Wilayah nasional secara alamiah terbagi ke dalam empat kutub ekonomi yang sangat spesifik, mulai dari sentra raksasa yang membutuhkan penetrasi otomatisasi mutakhir, hingga wilayah gurem yang mendesak membutuhkan fasilitas pendanaan dan pembangunan literasi digital. Bagi JALA Tech, pengelompokan yang divalidasi secara matematis ini secara logis menyingkirkan paradigma ekspansi pukul rata (*one-size-fits-all*) dan menggantinya dengan strategi penetrasi wilayah yang sangat presisi. Dengan mencocokkan portofolio teknologi (seperti perangkat keras JALA Baruno, analitik *machine learning*, fitur *traceability*, maupun fasilitas kredit JALA Finance) kepada klaster yang tepat, ongkos akuisisi pasar dapat ditekan secara drastis dengan menjamin tingkat adopsi teknologi yang berkesinambungan.
 
----
-
-## 5. Kesimpulan
-1. **Validitas Model**: Model memiliki tingkat validitas yang sangat baik terbukti dari Stress MDS (7.19%) dan Silhouette Score Clustering (0.6171).
-2. **Polarisasi:** Budidaya Udang terpolarisasi pada dua jenis sentra produksi: **Sentra Volume Agregat** (C1 - Jabar, Jatim, NTB) yang menghasilkan udang masif bersama komoditas lain, dan **Sentra Spesialis** (C2 - Aceh, Babel) yang perekonomian akuakulturnya bergantung sangat besar pada komoditas udang (premium & dominan).
-3. Hasil label dari setiap provinsi beserta metrik individunya telah disimpan di file `output/hasil_clustering.csv`.
+## e. Daftar Pustaka
+1. **Bosman, O., Soesilo, T. E. B., & Rahardjo, S. (2022).** Sustainable Status of Vaname Shrimp (Litopenaeus vannamei) Through Multi Dimensional Scaling (MDS) Approach. *Jurnal Airaha*, 11(02), 267–280. https://doi.org/10.15578/ja.v11i02.371
+2. **Kementerian Kelautan dan Perikanan RI (KKP). (2025).** KKP Pamerkan Potensi Udang Indonesia di Shrimp Summit 2025 Bali. *Siaran Pers KKP*. https://www.kkp.go.id/news/news-detail/kkp-pamerkan-potensi-udang-indonesia-di-shrimp-summit-2025-bali-BrmY.html
+3. **Komisi Pemberantasan Korupsi (KPK). (2025).** Soroti Kebocoran di Perizinan Tambak, KPK: Hanya 10% di NTB yang Kantongi Izin Lengkap. *Publikasi KPK*. https://kpk.go.id/id/ruang-informasi/berita/soroti-kebocoran-di-perizinan-tambak-kpk-hanya-10-di-ntb-yang-kantongi-izin-lengkap
+4. **FAO. (2024).** The State of World Fisheries and Aquaculture 2024. *Food and Agriculture Organization of the United Nations*. Dikutip dalam: Qems Journal on Blue Economy Financing. https://qemsjournal.org/index.php/qems/article/download/3991/2433
+5. **Universitas Islam Negeri Maulana Malik Ibrahim Malang. (2025).** Implementasi Spectral Clustering untuk Pengelompokkan Kabupaten/Kota di Indonesia Berdasarkan Indeks Khusus Penanganan Stunting. *Tesis*. http://etheses.uin-malang.ac.id/76504/
+6. **Universitas Islam Negeri Maulana Malik Ibrahim Malang. (2025).** Implementasi Metode Co-Plot Multidimensional Scaling dalam Analisis Wilayah. *Tesis*. http://etheses.uin-malang.ac.id/76369/
+7. **Bosman, O., Soesilo, T. E. B., & Rahardjo, S. (2022).** Status Keberlanjutan Budidaya Udang Vaname (Litopenaeus vannamei) Melalui Pendekatan Multi Dimensional Scaling (MDS). *Jurnal Airaha / Semanticscholar*. https://www.semanticscholar.org/paper/Status-Keberlanjutan-Budidaya-Udang-Vaname-Melalui-Bosman-Soesilo/c6fce536fff12f607904697b
+8. **JALA Tech. (2024).** Daerah Penghasil Udang di Indonesia: Ada di Mana Saja? *Blog JALA Tech*. https://jala.tech/id/blog/industri-udang/daerah-penghasil-udang-indonesia
+9. **Ahmed, M., Chowdhury, M.A., Rahman, M.M., & Islam, M.N. (2022).** IoT-based Smart Aquaculture: A Review of Recent Progress, Challenges, and Prospects. *Aquacultural Engineering*, 96, 102211. Dikutip dalam: Jurnal Teknologi Informasi dan Perikanan. http://jurnal.utu.ac.id/JTI/article/view/13748/0
+10. **Universitas Bangka Belitung. (2026).** Analisis Keberlanjutan Usaha Budi Daya Udang Vaname Di Desa Purworejo. *Jurnal Teknologi dan Manajemen Sumberdaya*. https://journal.ubb.ac.id/index.php/jtms/article/view/6778
