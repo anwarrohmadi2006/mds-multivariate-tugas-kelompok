@@ -36,7 +36,7 @@ Sebaliknya, perumusan kebijakan untuk wilayah Berskala Besar idealnya bertumpu p
 
 **Tabel 1. Statistik Deskriptif Rata-Rata per Klaster**
 
-| Klaster | Kategori | Rata-Rata Volume Panen | Rata-Rata Nilai Produksi | Rata-Rata Harga Jual |
+| Klaster | Kategori | Rata-Rata Volume Panen per Tahun | Rata-Rata Nilai Produksi per Tahun | Rata-Rata Harga Jual per Tahun |
 | :--- | :--- | :--- | :--- | :--- |
 | **C1** | Sentra Produksi Raksasa | 148.526 Ton | Rp 9.609.325 Juta | Rp 63.550 / kg |
 | **C2** | Wilayah Berskala Besar | 41.172 Ton | Rp 2.655.490 Juta | Rp 64.707 / kg |
