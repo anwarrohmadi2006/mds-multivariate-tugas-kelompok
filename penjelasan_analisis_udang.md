@@ -34,7 +34,18 @@ Sebaliknya, perumusan kebijakan untuk wilayah Berskala Besar idealnya bertumpu p
 
 <br>
 
-**Tabel 1. Ringkasan Klaster, Karakteristik, dan Rekomendasi Kebijakan Berkesinambungan JALA Tech**
+**Tabel 1. Statistik Deskriptif Rata-Rata per Klaster**
+
+| Klaster | Kategori | Rata-Rata Volume Panen | Rata-Rata Nilai Produksi | Rata-Rata Harga Jual |
+| :--- | :--- | :--- | :--- | :--- |
+| **C1** | Sentra Produksi Raksasa | 148.526 Ton | Rp 9.609.325 Juta | Rp 63.550 / kg |
+| **C2** | Wilayah Berskala Besar | 41.172 Ton | Rp 2.655.490 Juta | Rp 64.707 / kg |
+| **C3** | Wilayah Menengah | 13.795 Ton | Rp 1.272.070 Juta | Rp 94.609 / kg |
+| **C4** | Wilayah Skala Kecil | 5.245 Ton | Rp 312.313 Juta | Rp 61.811 / kg |
+
+<br>
+
+**Tabel 2. Ringkasan Klaster, Karakteristik, dan Rekomendasi Kebijakan Berkesinambungan JALA Tech**
 
 | Klaster | Kategori | Daftar Provinsi | Karakteristik Utama | Rekomendasi Kebijakan JALA Tech |
 | :--- | :--- | :--- | :--- | :--- |
