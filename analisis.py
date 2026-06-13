@@ -6,7 +6,7 @@ Pendekatan: CRISP-DM (Cross-Industry Standard Process for Data Mining)
 
 # [1. BUSINESS UNDERSTANDING]
 # Tujuan Bisnis: Memetakan potensi ekonomi udang per provinsi untuk merumuskan kebijakan distribusi 
-# teknologi JALA Tech (IoT, SaaS, Farm Log) secara presisi dan efisien (tidak one-size-fits-all).
+# teknologi JALA Tech (IoT, SaaS, Farm Log) secara presisi dan efisien.
 
 import numpy as np, pandas as pd, matplotlib.pyplot as plt, os, warnings
 from sklearn.preprocessing import RobustScaler
@@ -57,7 +57,7 @@ stress = np.sqrt(MDS(2, dissimilarity='precomputed', random_state=42).fit(dist).
 rsq = pearsonr(dist[np.triu_indices(len(df),1)], pairwise_distances(mds)[np.triu_indices(len(df),1)])[0]**2
 
 # [4. MODELING (Lanjutan)]
-# b. Penentuan nilai K-Optimal murni menggunakan Spectral Clustering (evaluasi Silhouette Score tanpa KMeans).
+# b. Penentuan nilai K-Optimal menggunakan Spectral Clustering (evaluasi Silhouette Score).
 res = []
 for k in range(2, 8):
     sc = SpectralClustering(n_clusters=k, assign_labels='kmeans', random_state=42).fit_predict(mds)
@@ -91,13 +91,16 @@ bg, txt = 'white', 'black'
 plt.style.use('default')
 colors = {'C1: Sangat Besar':'#E67E22', 'C2: Besar':'#C0392B', 'C3: Menengah':'#2980B9', 'C4: Kecil':'#27AE60'}
 
-# Chart 1: K-Optimal
+# Chart 1: Evaluasi K-Optimal
+# Menampilkan metrik Silhouette Score untuk menentukan jumlah klaster (K) terbaik yang paling optimal secara matematis.
 fig, ax = plt.subplots(figsize=(8,5), facecolor=bg)
 ax.plot(df_k.K, df_k.Sil_SC, 'o-', c='#E74C3C', linewidth=2)
 ax.set_title("K-Optimal Berdasarkan Silhouette Score (Spectral Clustering)")
 ax.set_xlabel("Jumlah Klaster (K)"); ax.set_ylabel("Silhouette Score")
 plt.savefig('output/01_elbow_silhouette.png', facecolor=bg); plt.close()
 
+# Chart 2: Peta Geometri MDS Spasial
+# Memvisualisasikan sebaran kedekatan karakteristik antar provinsi dalam ruang dua dimensi berdasarkan klasterisasi.
 fig, ax = plt.subplots(figsize=(10,6), facecolor=bg)
 for l in df.Label.unique():
     sub = df[df.Label == l]
@@ -106,6 +109,8 @@ for l in df.Label.unique():
 ax.legend(); ax.set_title(f"Peta MDS Udang (Stress {stress:.2f}%)")
 plt.savefig('output/02_peta_mds_final.png', facecolor=bg); plt.close()
 
+# Chart 3: Silhouette Bar Profile per Provinsi
+# Mengukur dan memvisualisasikan tingkat kerekatan (kohesi) setiap provinsi terhadap klasternya masing-masing.
 fig, ax = plt.subplots(figsize=(10,8), facecolor=bg)
 df_sil = df.sort_values(['Label','Sil'])
 y = np.arange(len(df_sil))
